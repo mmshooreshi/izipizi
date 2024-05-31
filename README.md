@@ -1,20 +1,16 @@
-Here's a simpler, more concise `README.md` with storytelling scenarios and ASCII art:
-
-```markdown
 # 📂 dir-bookmarks
 
-```
   ____________________________________________      __________________________________________
  /                                           /|    /                                         /|
 /___________________________________________/ |   /_________________________________________/ |
 |                                          |  |   |                                        |  |
-|                Bookmarks                 |  |   |                 Notes                  |  |
+|                Bookmark[d]s              |  |   |                 Notes                  |  |
 |==========================================|  |   |========================================|  |
-| Add Bookmark                             |  |   | Add Note to Bookmark                   |  |
+| Add Bookmark[d]                          |  |   | Add Note to Bookmark[d]                |  |
 | Command: bm <name>                       |  |   | Command: bn <name> <note>              |  |
 | Example: bm myproj                       |  |   | Example: bn myproj "My note"           |  |
 |------------------------------------------|  |   |----------------------------------------|  |
-| Go to Bookmark                           |  |   | List Notes                             |  |
+| Go to Bookmark[d]                        |  |   | List Notes                             |  |
 | Command: g <name>                        |  |   | Command: ln                            |  |
 | Example: g myproj                        |  |   | Example: ln                            |  |
 |------------------------------------------|  |   |----------------------------------------| / 
@@ -22,7 +18,7 @@ Here's a simpler, more concise `README.md` with storytelling scenarios and ASCII
 | Command: bl                              |  |
 | Example: bl                              | /
 |__________________________________________|/
-```
+
 
 ## 🚀 Installation
 
@@ -34,22 +30,22 @@ curl -sSL https://raw.githubusercontent.com/mmshooreshi/izipizi/main/install.sh 
 
 ## 📖 Usage
 
-- Bookmark the current directory with a memorable alias:
+- Bookmark[d] the current directory with a memorable alias:
   ```sh
   bm proj
   ```
 
-- Navigate to a bookmarked directory:
+- Navigate to a bookmarke:D directory:
   ```sh
   g proj
   ```
 
-- List all bookmarks with their paths and notes:
+- List all bookmark[d]s with their paths and notes:
   ```sh
   bl
   ```
 
-- Add a note to a bookmark:
+- Add a note to a bookmark[d]:
   ```sh
   bn proj "Main project directory"
   ```
@@ -61,27 +57,27 @@ curl -sSL https://raw.githubusercontent.com/mmshooreshi/izipizi/main/install.sh 
 
 ## 📂 Example Scenarios
 
-1. Bookmark the current project directory:
+1. Bookmark[d] the current project directory:
     ```sh
     bm proj
     ```
 
-2. Add a note to this bookmark:
+2. Add a note to this bookmark[d]:
     ```sh
     bn proj "Main project directory"
     ```
 
-3. Bookmark the downloads directory:
+3. Bookmark[d] the downloads directory:
     ```sh
     bm dl
     ```
 
-4. Add a note to the downloads bookmark:
+4. Add a note to the downloads bookmark[d]:
     ```sh
     bn dl "Downloads folder"
     ```
 
-5. List all bookmarks:
+5. List all bookmark[d]s:
     ```sh
     bl
     ```
@@ -110,12 +106,9 @@ curl -sSL https://raw.githubusercontent.com/mmshooreshi/izipizi/main/install.sh 
 
 ## 🛠 Troubleshooting
 
-- If you encounter issues, ensure that your shell configuration file (`.bashrc` or `.zshrc`) has been updated to source the `bookmark.sh` script.
+- If you encounter issues, ensure that your shell configuration file (`.bashrc` or `.zshrc`) has been updated to source the `bookmarkd.sh` script.
 - Restart your terminal or run `source ~/.bashrc` or `source ~/.zshrc` to apply changes.
 
 ---
 
-Happy bookmarking! 📁✨
-```
-
-Replace `yourusername` with your actual GitHub username in the installation command URL. This README is now concise and includes storytelling scenarios for better understanding.
+Happy bookmark[d]ing! 📁✨
