@@ -17,7 +17,7 @@ bm() {
 }
 
 # Go to bookmark
-g() {
+g0() {
   local DIR
   DIR=$(grep "^$1=" "$BOOKMARKS_FILE" | cut -d'=' -f2-)
   if [ -n "$DIR" ]; then
