@@ -1,35 +1,64 @@
 #!/bin/bash
 
-# URL of the bookmarkd.sh script in your GitHub repository
+# Constants
 REPO_URL="https://raw.githubusercontent.com/mmshooreshi/izipizi/main/bookmarkd.sh"
 TARGET_DIR="$HOME/.izipizi"
+SCRIPT_PATH="$TARGET_DIR/bookmarkd.sh"
 
-# Create target directory
-mkdir -p "$TARGET_DIR"
+# Color definitions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Download bookmarkd.sh script
-curl -o "$TARGET_DIR/bookmarkd.sh" "$REPO_URL"
-chmod +x "$TARGET_DIR/bookmarkd.sh"
+# Functions
+create_target_dir() {
+  mkdir -p "$TARGET_DIR"
+}
 
-# Detect the user's default shell and set the appropriate config file
-SHELL_NAME=$(basename "$SHELL")
-case "$SHELL_NAME" in
-  zsh)
-    SHELL_CONFIG="$HOME/.zshrc"
-    ;;
-  bash)
-    SHELL_CONFIG="$HOME/.bashrc"
-    ;;
-  *)
-    echo "Unsupported shell: $SHELL_NAME. Please add 'source $TARGET_DIR/bookmarkd.sh' to your shell configuration manually."
+download_script() {
+  if curl -o "$SCRIPT_PATH" "$REPO_URL"; then
+    chmod +x "$SCRIPT_PATH"
+  else
+    echo -e "${RED}Failed to download script from $REPO_URL${NC}"
     exit 1
-    ;;
-esac
+  fi
+}
 
-# Add source command to the shell configuration file if not already present
-if ! grep -Fxq "source $TARGET_DIR/bookmarkd.sh" "$SHELL_CONFIG"; then
-  echo "source $TARGET_DIR/bookmarkd.sh" >> "$SHELL_CONFIG"
-  echo "Bookmark script installed. Please restart your terminal or run 'source $SHELL_CONFIG'."
-else
-  echo "Bookmark script already installed."
-fi
+detect_shell_config() {
+  local shell_name=$(basename "$SHELL")
+  case "$shell_name" in
+    zsh)
+      echo "$HOME/.zshrc"
+      ;;
+    bash)
+      echo "$HOME/.bashrc"
+      ;;
+    *)
+      echo -e "${RED}Unsupported shell: $shell_name. Please add 'source $SCRIPT_PATH' to your shell configuration manually.${NC}"
+      exit 1
+      ;;
+  esac
+}
+
+add_source_command() {
+  local shell_config=$1
+  if ! grep -Fxq "source $SCRIPT_PATH" "$shell_config"; then
+    echo "" >> "$shell_config"
+    echo "source $SCRIPT_PATH" >> "$shell_config"
+    echo -e "${GREEN}Bookmark script installed. Please restart your terminal or run 'source $shell_config'.${NC}"
+  else
+    echo -e "${YELLOW}Bookmark script already installed.${NC}"
+  fi
+}
+
+main() {
+  create_target_dir
+  download_script
+  local shell_config=$(detect_shell_config)
+  add_source_command "$shell_config"
+}
+
+# Execute the main function
+main
