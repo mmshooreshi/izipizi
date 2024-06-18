@@ -19,6 +19,7 @@ create_target_dir() {
 
 download_script() {
   if curl -o "$SCRIPT_PATH" "$REPO_URL"; then
+    echo -e "${BLUE}Succesfully, downloaded the script from $REPO_URL${NC}"
     chmod +x "$SCRIPT_PATH"
   else
     echo -e "${RED}Failed to download script from $REPO_URL${NC}"
@@ -44,6 +45,8 @@ detect_shell_config() {
 
 add_source_command() {
   local shell_config=$1
+  echo -e "${BLUE} script path --> $SCRIPT_PATH must be added to --> $shell_config ...${NC}"
+
   if ! grep -Fxq "source $SCRIPT_PATH" "$shell_config"; then
     echo "" >> "$shell_config"
     echo "source $SCRIPT_PATH" >> "$shell_config"
@@ -57,6 +60,7 @@ main() {
   create_target_dir
   download_script
   local shell_config=$(detect_shell_config)
+  echo -e "${BLUE}Adding \`source bookmarkd.sh\` to $shell_config ...${NC}"
   add_source_command "$shell_config"
 }
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File to store bookmarks and notes
-BOOKMARKS_FILE="$HOME/.bookmark0s"
-NOTES_FILE="$HOME/.bookmark0s_notes"
+BOOKMARKS_FILE="$HOME/.bookmarks"
+NOTES_FILE="$HOME/.bookmarks_notes"
 
 # Color definitions
 RED='\033[0;31m'
@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 # Ensure files exist
 touch "$BOOKMARKS_FILE" "$NOTES_FILE"
 
-# Functions
+# Show help message
 bm_show_help() {
   echo -e "${BLUE}Usage: bm [COMMAND] [ARGS]${NC}"
   echo -e "${YELLOW}Commands:${NC}"
@@ -38,15 +38,21 @@ bm_show_help() {
   echo -e "      List all notes."
 }
 
+# Add a bookmark
 bm_add() {
   if [ -z "$1" ]; then
     echo -e "${RED}Bookmark name is required.${NC}"
     return 1
   fi
-  echo "$1=$(pwd)" >> "$BOOKMARKS_FILE"
-  echo -e "${GREEN}Bookmark '$1' added.${NC}"
+  if grep -q "^$1=" "$BOOKMARKS_FILE"; then
+    echo -e "${YELLOW}Bookmark '$1' already exists.${NC}"
+  else
+    echo "$1=$(pwd)" >> "$BOOKMARKS_FILE"
+    echo -e "${GREEN}Bookmark '$1' added.${NC}"
+  fi
 }
 
+# Go to a bookmark
 bm_go() {
   if [ -z "$1" ]; then
     echo -e "${RED}Bookmark name is required.${NC}"
@@ -61,8 +67,9 @@ bm_go() {
   fi
 }
 
+# List all bookmarks
 bm_list() {
-  if [ -f "$BOOKMARKS_FILE" ]; then
+  if [ -s "$BOOKMARKS_FILE" ]; then
     echo -e "${YELLOW}Bookmarks:${NC}"
     while read -r line; do
       echo -e "${GREEN}${line//=/: }${NC}"
@@ -74,17 +81,23 @@ bm_list() {
   fi
 }
 
+# Add a note to a bookmark
 bm_note() {
   if [ -z "$1" ] || [ -z "$2" ]; then
     echo -e "${RED}Bookmark name and note are required.${NC}"
     return 1
   fi
-  echo "$1: $2" >> "$NOTES_FILE"
-  echo -e "${GREEN}Note added to bookmark '$1'.${NC}"
+  if grep -q "^$1=" "$BOOKMARKS_FILE"; then
+    echo "$1: $2" >> "$NOTES_FILE"
+    echo -e "${GREEN}Note added to bookmark '$1'.${NC}"
+  else
+    echo -e "${RED}Bookmark '$1' not found.${NC}"
+  fi
 }
 
+# List all notes
 bm_list_notes() {
-  if [ -f "$NOTES_FILE" ]; then
+  if [ -s "$NOTES_FILE" ]; then
     echo -e "${YELLOW}Notes:${NC}"
     cat "$NOTES_FILE" | while read -r line; do
       echo -e "${GREEN}$line${NC}"
@@ -95,17 +108,15 @@ bm_list_notes() {
 }
 
 # Autocompletion for bookmark names
-_bookmark_complete() {
+_bm_complete() {
   local cur=${COMP_WORDS[COMP_CWORD]}
   COMPREPLY=( $(compgen -W "$(cut -d'=' -f1 $BOOKMARKS_FILE)" -- $cur) )
 }
 
-complete -F _bookmark_complete bm_go bm_note
+complete -F _bm_complete bm_go bm_note
 
-# Main
-if [ $# -eq 0 ]; then
-  bm_show_help
-else
+# Main function to handle commands
+bm() {
   case "$1" in
     help)
       bm_show_help
@@ -131,7 +142,14 @@ else
     *)
       echo -e "${RED}Invalid command: $1${NC}"
       bm_show_help
-      exit 1
+      return 1
       ;;
   esac
-fi
+}
+
+# Alias for convenience
+alias bm='bm'
+
+# Source this file in your ~/.zshrc
+# For example, add the following line to ~/.zshrc:
+# source /path/to/this/bookmarkd.sh
