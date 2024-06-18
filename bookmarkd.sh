@@ -18,24 +18,24 @@ touch "$BOOKMARKS_FILE" "$NOTES_FILE"
 bm_show_help() {
   echo -e "${BLUE}Usage:${NC}"
   echo -e "${YELLOW}Commands:${NC}"
-  echo -e "  ${GREEN}+b <name>${NC}        Add a bookmark with the given name"
-  echo -e "  ${GREEN}-b <name>${NC}        Delete the bookmark with the given name"
-  echo -e "  ${GREEN}>b <name>${NC}        Go to the directory of the bookmark with the given name"
-  echo -e "  ${GREEN}?b${NC}              List all bookmarks"
-  echo -e "  ${GREEN}+n <name> <note>${NC} Add a note to the bookmark with the given name"
-  echo -e "  ${GREEN}?n${NC}              List all notes"
-  echo -e "  ${GREEN}help${NC}            Show this help message"
+  echo -e "  ${GREEN}bm add <name>${NC}        Add a bookmark with the given name"
+  echo -e "  ${GREEN}bm delete <name>${NC}     Delete the bookmark with the given name"
+  echo -e "  ${GREEN}bm go <name>${NC}         Go to the directory of the bookmark with the given name"
+  echo -e "  ${GREEN}bm list${NC}              List all bookmarks"
+  echo -e "  ${GREEN}bm note <name> <note>${NC} Add a note to the bookmark with the given name"
+  echo -e "  ${GREEN}bm notes${NC}             List all notes"
+  echo -e "  ${GREEN}bm help${NC}              Show this help message"
   echo -e ""
   echo -e "${YELLOW}Examples:${NC}"
-  echo -e "  ${GREEN}+b project${NC}"
+  echo -e "  ${GREEN}bm add project${NC}"
   echo -e "      Add a bookmark named 'project'."
-  echo -e "  ${GREEN}>b project${NC}"
+  echo -e "  ${GREEN}bm go project${NC}"
   echo -e "      Navigate to the directory of the bookmark named 'project'."
-  echo -e "  ${GREEN}?b${NC}"
+  echo -e "  ${GREEN}bm list${NC}"
   echo -e "      List all bookmarks."
-  echo -e "  ${GREEN}+n project \"Important note\"${NC}"
+  echo -e "  ${GREEN}bm note project \"Important note\"${NC}"
   echo -e "      Add a note to the bookmark named 'project'."
-  echo -e "  ${GREEN}?n${NC}"
+  echo -e "  ${GREEN}bm notes${NC}"
   echo -e "      List all notes."
 }
 
@@ -88,9 +88,11 @@ bm_list() {
   if [ -s "$BOOKMARKS_FILE" ]; then
     echo -e "${YELLOW}Bookmarks:${NC}"
     while read -r line; do
-      echo -e "${GREEN}${line//=/: }${NC}"
+      local NAME="${line%%=*}"
+      local DIR="${line#*=}"
+      echo -e "${GREEN}${NAME}:${NC} ${DIR}"
       # Display notes if any
-      grep "^${line//=/: }" "$NOTES_FILE" 2>/dev/null | sed 's/^/  Note: /'
+      grep "^$NAME: " "$NOTES_FILE" | sed 's/^/  Note: /'
     done < "$BOOKMARKS_FILE"
   else
     echo -e "${RED}No bookmarks found.${NC}"
@@ -115,21 +117,13 @@ bm_note() {
 bm_list_notes() {
   if [ -s "$NOTES_FILE" ]; then
     echo -e "${YELLOW}Notes:${NC}"
-    cat "$NOTES_FILE" | while read -r line; do
+    while read -r line; do
       echo -e "${GREEN}$line${NC}"
-    done
+    done < "$NOTES_FILE"
   else
     echo -e "${RED}No notes found.${NC}"
   fi
 }
-
-# Autocompletion for bookmark names
-_bm_complete() {
-  local cur=${COMP_WORDS[COMP_CWORD]}
-  COMPREPLY=( $(compgen -W "$(cut -d'=' -f1 $BOOKMARKS_FILE)" -- $cur) )
-}
-
-complete -F _bm_complete bm_go bm_note bm_delete
 
 # Main function to handle commands
 bm() {
@@ -137,26 +131,26 @@ bm() {
     help)
       bm_show_help
       ;;
-    +b)
+    add)
       shift
       bm_add "$@"
       ;;
-    -b)
+    delete)
       shift
       bm_delete "$@"
       ;;
-    >b)
+    go)
       shift
       bm_go "$@"
       ;;
-    ?b)
+    list)
       bm_list
       ;;
-    +n)
+    note)
       shift
       bm_note "$@"
       ;;
-    ?n)
+    notes)
       bm_list_notes
       ;;
     *)
@@ -167,11 +161,16 @@ bm() {
   esac
 }
 
-# Source this file in your ~/.zshrc
-# For example, add the following line to ~/.zshrc:
-# source /path/to/this/bookmarkd.sh
-# Alias for convenience
-alias bm='bm'
+# Enable autocompletion for bookmark names
+_bm_complete() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  COMPREPLY=( $(compgen -W "$(cut -d'=' -f1 "$BOOKMARKS_FILE")" -- "$cur") )
+}
 
-# Export functions for Zsh autocompletion
-typeset -f bm bm_show_help bm_add bm_delete bm_go bm_list bm_note bm_list_notes _bm_complete > /dev/null
+complete -F _bm_complete bm
+
+# Ensure the script is executable
+chmod +x "$0"
+
+# Add the following line to your ~/.bashrc or ~/.zshrc to source the script
+# source /path/to/this/bookmark.sh
